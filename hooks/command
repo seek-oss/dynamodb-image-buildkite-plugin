@@ -150,7 +150,7 @@ function publish_multi_arch_manifest {
 }
 
 # Install emulators
-docker run --privileged --rm tonistiigi/binfmt --install all
+docker run --rm tonistiigi/binfmt --install all
 
 # Initial setup
 read_tables
