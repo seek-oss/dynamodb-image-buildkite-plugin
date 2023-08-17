@@ -149,7 +149,7 @@ start_containers
 
 # # Create tables
 retrieve_schemas
-# create_tables
+create_tables
 
 # # Publish images
 # publish_images
