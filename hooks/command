@@ -64,7 +64,7 @@ function check_null() {
 function start_containers {
   for architecture in "${architectures[@]}"; do
     docker pull amazon/dynamodb-local --platform linux/$architecture
-    docker compose up --detach --force-recreate amazon-dynamodb-$architecture
+    docker compose -f $script_dir/docker-compose.yml up --detach --force-recreate amazon-dynamodb-$architecture 
   done
 }
 
@@ -147,13 +147,13 @@ function publish_multi_arch_manifest {
 read_tables
 start_containers
 
-# Create tables
-retrieve_schemas
-create_tables
+# # Create tables
+# retrieve_schemas
+# create_tables
 
-# Publish images
-publish_images
-publish_multi_arch_manifest
+# # Publish images
+# publish_images
+# publish_multi_arch_manifest
 
 docker compose stop
 

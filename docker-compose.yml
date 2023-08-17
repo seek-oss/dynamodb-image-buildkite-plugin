@@ -5,21 +5,3 @@ services:
     command: ['--id', 'seek-oss/dynamodb-image']
     volumes:
       - ".:/plugin:ro"
-
-  amazon-dynamodb-amd64:
-    image: amazon/dynamodb-local
-    platform: linux/amd64
-    entrypoint:
-      ['java', '-jar', 'DynamoDBLocal.jar', '-port', '8003', '-sharedDb']
-    ports:
-      - 8003
-    restart: always
-
-  amazon-dynamodb-arm64:
-    image: amazon/dynamodb-local
-    platform: linux/arm64
-    entrypoint:
-      ['java', '-jar', 'DynamoDBLocal.jar', '-port', '8003', '-sharedDb']
-    ports:
-      - 8003
-    restart: always
