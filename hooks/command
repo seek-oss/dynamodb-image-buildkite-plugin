@@ -4,6 +4,7 @@ set -euo pipefail
 
 # Needed for `docker manifest`
 export DOCKER_CLI_EXPERIMENTAL=enabled
+export AWS_PAGER=""
 
 build="${BUILDKITE_BUILD_NUMBER:-0}"
 repository="$BUILDKITE_PLUGIN_DYNAMODB_IMAGE_REPOSITORY"
