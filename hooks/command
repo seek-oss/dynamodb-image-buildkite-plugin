@@ -73,7 +73,6 @@ function retrieve_schemas {
   mkdir -p $schema_dir
   for table in "${tables[@]}"; do  
     local schema_file="${schema_dir}/${table}.json"
-    local local_dynamo_endpoint="http://$(docker-compose -f $script_dir/docker-compose.yml port amazon-dynamodb-$architecture 8003)"
     echo "Retrieving schema of $table..."
     aws dynamodb describe-table \
       --table-name "${table}" \
@@ -85,7 +84,9 @@ function retrieve_schemas {
 # Create the tables in each image
 function create_tables {
   for architecture in "${architectures[@]}"; do
-    local local_dynamo_endpoint="http://$(docker-compose -f $script_dir/docker-compose.yml port amazon-dynamodb-$architecture 8003)"
+    local dynamo_url=$(docker-compose -f $script_dir/docker-compose.yml port amazon-dynamodb-$architecture 8003)
+    echo $dynamo_url
+    local local_dynamo_endpoint="http://$dynamo_url"
     check_null local_dynamo_endpoint
     echo $local_dynamo_endpoint
     for table in "${tables[@]}"; do
