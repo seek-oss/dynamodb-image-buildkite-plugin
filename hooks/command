@@ -67,6 +67,9 @@ function start_containers {
     docker pull amazon/dynamodb-local --platform linux/$architecture
     docker compose -f $script_dir/docker-compose.yml up --detach --force-recreate amazon-dynamodb-$architecture 
   done
+  echo "Sleeping"
+  sleep 10
+  docker-compose -f $script_dir/docker-compose.yml ps 
 }
 
 # Retrieves schemas and saves them as JSON
