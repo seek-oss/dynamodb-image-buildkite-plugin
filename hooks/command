@@ -87,7 +87,7 @@ function create_tables {
   for architecture in "${architectures[@]}"; do
     local local_dynamo_endpoint="http://$(docker-compose -f $script_dir/docker-compose.yml port amazon-dynamodb-$architecture 8003)"
     check_null local_dynamo_endpoint
-
+    echo $local_dynamo_endpoint
     for table in "${tables[@]}"; do
       local schema_file="${schema_dir}/${table}.json"
       local attributes=$(cat "${schema_file}" | jq '.["Table"]."AttributeDefinitions"')
@@ -155,5 +155,5 @@ create_tables
 # publish_images
 # publish_multi_arch_manifest
 
-docker compose stop
+docker compose -f $script_dir/docker-compose.yml stop
 
