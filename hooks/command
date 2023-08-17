@@ -149,9 +149,10 @@ function publish_multi_arch_manifest {
   echo "Published image to ECR: $image_prefix"
 }
 
-# Initial setup
-docker run -it --rm --platform linux/amd64 amazon/dynamodb-local
+# Install emulators
+docker run --privileged --rm tonistiigi/binfmt --install all
 
+# Initial setup
 read_tables
 start_containers
 
