@@ -150,6 +150,8 @@ function publish_multi_arch_manifest {
 }
 
 # Initial setup
+docker run -it --rm --platform linux/amd64 amazon/dynamodb-local
+
 read_tables
 start_containers
 
