@@ -90,7 +90,8 @@ function create_tables {
   for architecture in "${architectures[@]}"; do
     local dynamo_url=$(docker-compose -f $script_dir/docker-compose.yml port amazon-dynamodb-$architecture 8003)
     echo $dynamo_url
-    docker-compose -f $script_dir/docker-compose.yml ps     
+    docker-compose -f $script_dir/docker-compose.yml ps 
+    
     local local_dynamo_endpoint="http://$dynamo_url"
     check_null local_dynamo_endpoint
     echo $local_dynamo_endpoint
@@ -148,9 +149,6 @@ function publish_multi_arch_manifest {
 
   echo "Published image to ECR: $image_prefix"
 }
-
-# Install emulators
-docker run --rm tonistiigi/binfmt --install all
 
 # Initial setup
 read_tables
