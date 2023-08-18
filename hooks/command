@@ -13,7 +13,7 @@ script_dir="$(dirname "${BASH_SOURCE[0]}")"
 
 schema_dir="${script_dir}/schemas"
 
-architectures=("arm64" "amd64")
+architectures=("amd64" "arm64")
 
 # read a plugin property of type [array, string] into a Bash array. Buildkite
 # exposes a string value at BUILDKITE_PLUGIN_{NAME}_{KEY}, and array values at
@@ -75,14 +75,18 @@ function start_containers {
 # Retrieves schemas and saves them as JSON
 function retrieve_schemas { 
   mkdir -p $schema_dir
-  for table in "${tables[@]}"; do  
+  for table in "${tables[@]}"; do
+    local dynamo_url=$(docker-compose -f $script_dir/docker-compose.yml port amazon-dynamodb-$architecture 8003)
+    echo $dynamo_url
     local schema_file="${schema_dir}/${table}.json"
     echo "Retrieving schema of $table..."
     aws dynamodb describe-table \
       --table-name "${table}" \
       --output json \
       > "${schema_file}"
+    aws dynamodb list-tables --region "local" --endpoint ${local_dynamo_endpoint}
   done
+
 }
 
 # Create the tables in each image
