@@ -1,1 +1,2 @@
 hooks/schemas
+hooks/dynamodb-local
