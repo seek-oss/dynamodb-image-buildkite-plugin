@@ -1,0 +1,12 @@
+name: DynamoDB Image Publisher
+description: Creates multi-arch DynamoDB images with the specified schema and deploys them to ECR
+author: https://github.com/seek-oss
+requirements:
+  - docker
+configuration:
+  properties:
+    repository:
+      type: string
+    tables:
+      type: [array, string]
+  required: ['repository', 'tables']

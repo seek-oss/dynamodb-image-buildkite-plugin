@@ -1,0 +1,7 @@
+version: '3.7'
+services:
+  lint:
+    image: buildkite/plugin-linter
+    command: ['--id', 'seek-oss/dynamodb-image']
+    volumes:
+      - ".:/plugin:ro"
