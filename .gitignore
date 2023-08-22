@@ -1,2 +1,1 @@
-hooks/schemas
-hooks/dynamodb-local
+hooks/tmp

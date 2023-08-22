@@ -5,17 +5,12 @@ set -euo pipefail
 export DOCKER_CLI_EXPERIMENTAL=enabled
 export AWS_PAGER=""
 
-# Setup variables
 build="${BUILDKITE_BUILD_NUMBER:-0}"
 repository="$BUILDKITE_PLUGIN_DYNAMODB_IMAGE_REPOSITORY"
 tables=()
 script_dir="$(dirname "${BASH_SOURCE[0]}")"
-dynamodb_local_dir=$script_dir/dynamodb-local
-schema_dir="${script_dir}/schemas"
-
-# Setup directories
-mkdir -p $dynamodb_local_dir
-mkdir -p $schema_dir
+tmp_dir="${script_dir}/tmp"
+mkdir -p $tmp_dir
 
 # read a plugin property of type [array, string] into a Bash array. Buildkite
 # exposes a string value at BUILDKITE_PLUGIN_{NAME}_{KEY}, and array values at
@@ -57,7 +52,7 @@ function read_tables {
 # Retrieves schemas and saves them as JSON
 function retrieve_schemas {
   for table in "${tables[@]}"; do
-    local schema_file="${schema_dir}/${table}.json"
+    local schema_file="${tmp_dir}/${table}.json"
     aws dynamodb describe-table \
       --table-name "${table}" \
       --output json \
@@ -73,7 +68,7 @@ function start_local_dynamo {
 
 # Saves the database file so that we can use it in the build
 function save_database {
-  docker cp dynamo-local:/home/dynamodblocal/shared-local-instance.db $dynamodb_local_dir/shared-local-instance.db
+  docker cp dynamo-local:/home/dynamodblocal/shared-local-instance.db $tmp_dir/shared-local-instance.db
 }
 
 # Stop running local dynamo
@@ -85,7 +80,7 @@ function stop_local_dynamo {
 function create_tables {
   local local_dynamo_endpoint="http://localhost:8000"
   for table in "${tables[@]}"; do
-    local schema_file="${schema_dir}/${table}.json"
+    local schema_file="${tmp_dir}/${table}.json"
     local attributes=$(cat "${schema_file}" | jq '.["Table"]."AttributeDefinitions"')
     local key_schema=$(cat "${schema_file}" | jq '.["Table"]."KeySchema"')
     local gsis=$(cat "${schema_file}" | jq '[.["Table"]."GlobalSecondaryIndexes"[] | {Projection: .Projection, IndexName: .IndexName, KeySchema: .KeySchema }]')
