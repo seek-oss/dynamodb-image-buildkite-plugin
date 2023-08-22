@@ -9,39 +9,31 @@ build="${BUILDKITE_BUILD_NUMBER:-0}"
 repository="$BUILDKITE_PLUGIN_DYNAMODB_IMAGE_REPOSITORY"
 tables=()
 script_dir="$(dirname "${BASH_SOURCE[0]}")"
+local_dynamo_container_id=""
+local_dynamo_port=8000
 tmp_dir="${script_dir}/tmp"
 mkdir -p $tmp_dir
 
-# read a plugin property of type [array, string] into a Bash array. Buildkite
+# Read a plugin property of type [array, string] into a Bash array. Buildkite
 # exposes a string value at BUILDKITE_PLUGIN_{NAME}_{KEY}, and array values at
 # BUILDKITE_PLUGIN_{NAME}_{KEY}_{IDX}.
 function read_list_property {
   local prefix="BUILDKITE_PLUGIN_DYNAMODB_IMAGE_${1}"
   local property="${prefix}_0"
-
   result=()
-
   if [[ -n ${!property:-} ]]; then
     local i=0
     local property="${prefix}_${i}"
-
     while [[ -n ${!property:-} ]]; do
       result+=("${!property}")
-
       i=$((i + 1))
       property="${prefix}_${i}"
     done
   elif [[ -n ${!prefix:-} ]]; then
     result+=("${!prefix}")
   fi
-
   [[ ${#result[@]} -gt 0 ]] || return 1
 }
-
-# function kill_by_port {
-#   pid=$(lsof -i tcp:$1 -Fp | head -n 1 | sed 's/^p//')
-#   kill -9 $pid
-# }
 
 # Read tables into an array
 function read_tables {
@@ -66,26 +58,25 @@ function retrieve_schemas {
 }
 
 # Pulls local DynamoDB and runs it on port 8000
-container_id=""
 function start_local_dynamo {
   docker pull amazon/dynamodb-local:latest
-  container_id=$(docker run -d -p 8000:8000 amazon/dynamodb-local:latest -jar DynamoDBLocal.jar -port 8000 -sharedDb)
-  sleep 5
+  local_dynamo_container_id=$(docker run -d -p $local_dynamo_port:$local_dynamo_port amazon/dynamodb-local:latest -jar DynamoDBLocal.jar -port $local_dynamo_port -sharedDb)
+  sleep 5 # Give container a bit of time to start up
 }
 
 # Saves the database file so that we can use it in the build
 function save_database {
-  docker cp $container_id:/home/dynamodblocal/shared-local-instance.db $tmp_dir/shared-local-instance.db
+  docker cp $local_dynamo_container_id:/home/dynamodblocal/shared-local-instance.db $tmp_dir/shared-local-instance.db
 }
 
 # Stop running local dynamo
 function stop_local_dynamo {
-  docker stop $container_id
+  docker stop $local_dynamo_container_id
 }
 
 # Create the tables
 function create_tables {
-  local local_dynamo_endpoint="http://localhost:8000"
+  local local_dynamo_endpoint="http://localhost:$local_dynamo_port"
   for table in "${tables[@]}"; do
     local schema_file="${tmp_dir}/${table}.json"
     local attributes=$(cat "${schema_file}" | jq '.["Table"]."AttributeDefinitions"')
@@ -102,7 +93,7 @@ function create_tables {
   aws dynamodb list-tables --region "local" --endpoint ${local_dynamo_endpoint}
 }
 
-# Builds the multi arch image and publishes it
+# Builds the multi-arch image and publishes it
 function build_and_publish {
   cd $script_dir
   docker buildx create --use
@@ -115,8 +106,6 @@ function build_and_publish {
   docker buildx rm
 }
 
-# kill_by_port 8000
-docker ps
 read_tables
 echo "1. Retrieve schemas..."
 retrieve_schemas
