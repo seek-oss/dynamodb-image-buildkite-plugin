@@ -60,10 +60,11 @@ function retrieve_schemas {
   done
 }
 
-# Retrieves local DynamoDB and runs it on port 8003
+# Pulls local DynamoDB and runs it on port 8000
 function start_local_dynamo {
   docker pull amazon/dynamodb-local:latest
   docker run -d -p 8000:8000 --name dynamo-local amazon/dynamodb-local:latest -jar DynamoDBLocal.jar -port 8000 -sharedDb
+  sleep 5
 }
 
 # Saves the database file so that we can use it in the build
