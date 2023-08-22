@@ -38,10 +38,10 @@ function read_list_property {
   [[ ${#result[@]} -gt 0 ]] || return 1
 }
 
-function kill_by_port {
-  pid=$(lsof -i tcp:$1 -Fp | head -n 1 | sed 's/^p//')
-  kill -9 $pid
-}
+# function kill_by_port {
+#   pid=$(lsof -i tcp:$1 -Fp | head -n 1 | sed 's/^p//')
+#   kill -9 $pid
+# }
 
 # Read tables into an array
 function read_tables {
@@ -115,7 +115,8 @@ function build_and_publish {
   docker buildx rm
 }
 
-kill_by_port 8000
+# kill_by_port 8000
+docker ps
 read_tables
 echo "1. Retrieve schemas..."
 retrieve_schemas
