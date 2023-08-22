@@ -5,6 +5,17 @@ set -euo pipefail
 export DOCKER_CLI_EXPERIMENTAL=enabled
 export AWS_PAGER=""
 
+function check_null {
+  local var_name="$1"
+  local var_value="${!var_name:-}"
+  if [[ -z "$var_value" ]]; then
+    echo "The environment variable $var_name must be set."
+    exit 1
+  fi
+}
+
+check_null BUILDKITE_BUILD_NUMBER
+
 build="${BUILDKITE_BUILD_NUMBER:-0}"
 repository="$BUILDKITE_PLUGIN_DYNAMODB_IMAGE_REPOSITORY"
 tables=()
@@ -106,13 +117,13 @@ function build_and_publish {
   docker buildx rm
 }
 
-read_tables
-echo "1. Retrieve schemas..."
-retrieve_schemas
-echo "2. Create database file..."
-start_local_dynamo
-create_tables
-save_database
-stop_local_dynamo
-echo "3. Build and publish multi-arch images..."
-build_and_publish
+# read_tables
+# echo "1. Retrieve schemas..."
+# retrieve_schemas
+# echo "2. Create database file..."
+# start_local_dynamo
+# create_tables
+# save_database
+# stop_local_dynamo
+# echo "3. Build and publish multi-arch images..."
+# build_and_publish
