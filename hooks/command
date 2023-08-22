@@ -72,7 +72,7 @@ function retrieve_schemas {
 function start_local_dynamo {
   docker pull amazon/dynamodb-local:latest
   local_dynamo_container_id=$(docker run -d -p $local_dynamo_port:$local_dynamo_port amazon/dynamodb-local:latest -jar DynamoDBLocal.jar -port $local_dynamo_port -sharedDb)
-  sleep 5 # Give container a bit of time to start up
+  sleep 5 # TODO: This gives the container a bit of time to start up, but it would be better to poll for when its up instead
 }
 
 # Saves the database file so that we can use it in the build
