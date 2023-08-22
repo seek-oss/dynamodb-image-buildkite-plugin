@@ -25,7 +25,7 @@ script_dir="$(dirname "${BASH_SOURCE[0]}")"
 local_dynamo_container_id=""
 local_dynamo_port=8000
 tmp_dir="${script_dir}/tmp"
-mkdir -p $tmp_dir
+mkdir -p "${tmp_dir}"
 
 # Read a plugin property of type [array, string] into a Bash array. Buildkite
 # exposes a string value at BUILDKITE_PLUGIN_{NAME}_{KEY}, and array values at
@@ -73,28 +73,29 @@ function retrieve_schemas {
 # Pulls local DynamoDB and runs it on port 8000
 function start_local_dynamo {
   docker pull amazon/dynamodb-local:latest
-  local_dynamo_container_id=$(docker run -d -p $local_dynamo_port:$local_dynamo_port amazon/dynamodb-local:latest -jar DynamoDBLocal.jar -port $local_dynamo_port -sharedDb)
+  local_dynamo_container_id=$(docker run -d -p "${local_dynamo_port}":"${local_dynamo_port}" amazon/dynamodb-local:latest -jar DynamoDBLocal.jar -port "${local_dynamo_port}" -sharedDb)
   sleep 5 # TODO: This gives the container a bit of time to start up, but it would be better to poll for when its up instead
 }
 
 # Saves the database file so that we can use it in the build
 function save_database {
-  docker cp $local_dynamo_container_id:/home/dynamodblocal/shared-local-instance.db $tmp_dir/shared-local-instance.db
+  docker cp "${local_dynamo_container_id}":/home/dynamodblocal/shared-local-instance.db "${tmp_dir}"/shared-local-instance.db
 }
 
 # Stop running local dynamo
 function stop_local_dynamo {
-  docker stop $local_dynamo_container_id
+  docker stop "${local_dynamo_container_id}"
 }
 
 # Create the tables
 function create_tables {
-  local local_dynamo_endpoint="http://localhost:$local_dynamo_port"
+  local local_dynamo_endpoint=http://localhost:"${local_dynamo_port}"
   for table in "${tables[@]}"; do
-    local schema_file="${tmp_dir}/${table}.json"
-    local attributes=$(cat "${schema_file}" | jq '.["Table"]."AttributeDefinitions"')
-    local key_schema=$(cat "${schema_file}" | jq '.["Table"]."KeySchema"')
-    local gsis=$(cat "${schema_file}" | jq '[.["Table"]."GlobalSecondaryIndexes"[] | {Projection: .Projection, IndexName: .IndexName, KeySchema: .KeySchema }]')
+    local schema_file attributes key_schema gsis
+    schema_file="${tmp_dir}/${table}.json"
+    attributes=$(jq '.["Table"]."AttributeDefinitions"' "${schema_file}")
+    key_schema=$(jq '.["Table"]."KeySchema"' "${schema_file}")
+    gsis=$(jq '[.["Table"]."GlobalSecondaryIndexes"[] | {Projection: .Projection, IndexName: .IndexName, KeySchema: .KeySchema }]' "${schema_file}")
     aws dynamodb create-table \
       --table-name "${table}" \
       --attribute-definitions "${attributes}" \
@@ -108,14 +109,14 @@ function create_tables {
 
 # Builds the multi-arch image and publishes it
 function build_and_publish {
-  cd $script_dir
+  cd "${script_dir}"
   docker buildx create --use
   if [[ ${BUILDKITE_BRANCH} == "${BUILDKITE_PIPELINE_DEFAULT_BRANCH}" ]]; then
     image="${repository}:latest"
   else
     image="${repository}:branch-${build}"
   fi
-  docker buildx build --push --no-cache -t $image -f $script_dir/Dockerfile --platform linux/arm64,linux/amd64 .
+  docker buildx build --push --no-cache -t "${image}" -f "${script_dir}"/Dockerfile --platform linux/arm64,linux/amd64 .
   docker buildx rm
 }
 
