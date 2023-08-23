@@ -9,4 +9,6 @@ configuration:
       type: string
     tables:
       type: [array, string]
+    login:
+      type: boolean
   required: ['repository', 'tables']
