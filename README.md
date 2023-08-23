@@ -13,13 +13,11 @@ TODO: Add examples once there is a release
 
 ## Configuration
 
-- `repository` (required, string)
-
-  The URI of the ECR repository to publish the image to.
-
-- `tables` (required, string[])
-
-  The names of the DynamoDB tables.
+| Argument Name | Type                  | Description                                                 |
+| ------------- | --------------------- | ----------------------------------------------------------- |
+| `repository`  | `string` (required)   | The URI of the ECR repository to publish the image to.      |
+| `tables`      | `string[]` (required) | The names of the DynamoDB tables.                           |
+| `port`        | `number` (optional)   | The port that DynamoDB local will run on. Defaults to 8000. |
 
 ## License
 
