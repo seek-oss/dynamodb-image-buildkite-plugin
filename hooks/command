@@ -87,7 +87,7 @@ function stop_local_dynamo {
   docker stop "${local_dynamo_container_id}"
 }
 
-# Create the tables
+# Create the tables in the local Dynamo image
 function create_tables {
   local local_dynamo_endpoint=http://localhost:"${local_dynamo_port}"
   for table in "${tables[@]}"; do
@@ -116,7 +116,11 @@ function build_and_publish {
   else
     image="${repository}:branch-${build}"
   fi
-  docker buildx build --push --no-cache -t "${image}" -f "${script_dir}"/Dockerfile --platform linux/arm64,linux/amd64 .
+
+  local dynamo_port
+  dynamo_port="${BUILDKITE_PLUGIN_DYNAMODB_IMAGE_PORT:-8000}"
+
+  docker buildx build --push --no-cache -t "${image}" -f "${script_dir}"/Dockerfile --platform linux/arm64,linux/amd64 --build-arg PORT="${dynamo_port}" .
   docker buildx rm
 }
 

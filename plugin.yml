@@ -9,4 +9,6 @@ configuration:
       type: string
     tables:
       type: [array, string]
+    port:
+      type: number
   required: ['repository', 'tables']
