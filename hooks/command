@@ -19,7 +19,7 @@ check_null BUILDKITE_BRANCH
 check_null BUILDKITE_PIPELINE_DEFAULT_BRANCH
 
 build="${BUILDKITE_BUILD_NUMBER:-}"
-repository="$BUILDKITE_PLUGIN_DYNAMODB_IMAGE_REPOSITORY"
+repository="${BUILDKITE_PLUGIN_DYNAMODB_IMAGE_REPOSITORY}"
 tables=()
 script_dir="$(dirname "${BASH_SOURCE[0]}")"
 local_dynamo_container_id=""
@@ -56,6 +56,16 @@ function read_tables {
     done
   else
     echo "A list of tables must be provided."
+  fi
+}
+
+# Login to ECR
+function login_to_ecr {
+  if [ "${BUILDKITE_PLUGIN_DYNAMODB_IMAGE_LOGIN}" = 1 ]; then
+    local aws_region aws_account_id
+    aws_region=$(aws configure get region)
+    aws_account_id=$(aws sts get-caller-identity --query "Account" --output text)
+    aws ecr get-login-password --region "${aws_region}" | docker login --username AWS --password-stdin "${aws_account_id}".dkr.ecr."${aws_region}".amazonaws.com
   fi
 }
 
