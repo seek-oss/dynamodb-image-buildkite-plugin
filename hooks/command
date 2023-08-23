@@ -128,13 +128,13 @@ function build_and_publish {
   docker buildx rm
 }
 
-# read_tables
-# echo "1. Retrieve schemas..."
-# retrieve_schemas
-# echo "2. Create database file..."
-# start_local_dynamo
-# create_tables
-# save_database
-# stop_local_dynamo
-# echo "3. Build and publish multi-arch images..."
+read_tables
+echo "1. Retrieve schemas..."
+retrieve_schemas
+echo "2. Create database file..."
+start_local_dynamo
+create_tables
+save_database
+stop_local_dynamo
+echo "3. Build and publish multi-arch images..."
 build_and_publish
