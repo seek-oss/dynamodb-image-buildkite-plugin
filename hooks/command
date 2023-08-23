@@ -118,11 +118,7 @@ function build_and_publish {
   fi
 
   local dynamo_port
-  if [[ -z "${BUILDKITE_PLUGIN_DYNAMODB_IMAGE_PORT:-}" ]]; then
-    dynamo_port=8000
-  else
-    dynamo_port="${BUILDKITE_PLUGIN_DYNAMODB_IMAGE_PORT}"
-  fi
+  dynamo_port="${BUILDKITE_PLUGIN_DYNAMODB_IMAGE_PORT:-8000}"
 
   docker buildx build --push --no-cache -t "${image}" -f "${script_dir}"/Dockerfile --platform linux/arm64,linux/amd64 --build-arg PORT="${dynamo_port}" .
   docker buildx rm
