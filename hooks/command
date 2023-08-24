@@ -89,8 +89,10 @@ function stop_local_dynamo {
 
 # Create the tables in the local Dynamo image
 function create_tables {
-  local local_dynamo_endpoint
-  local_dynamo_endpoint=$(docker port "${local_dynamo_container_id}" "${local_dynamo_port}")
+  local local_dynamo_endpoint container_port
+  container_port=$(docker port "${local_dynamo_container_id}" "${local_dynamo_port}" | cut -d':' -f2)
+  echo "Waiting for local DynamoDB to start on port ${container_port}"
+  local_dynamo_endpoint=http://localhost:"${container_port}"
   echo "Creating tables in local DynamoDB at ${local_dynamo_endpoint}"
   for table in "${tables[@]}"; do
     local schema_file table_json
