@@ -73,7 +73,7 @@ function retrieve_schemas {
 # Pulls local DynamoDB and runs it on port 8000
 function start_local_dynamo {
   docker pull amazon/dynamodb-local:latest
-  local_dynamo_container_id=$(docker run -d -p 0:"${local_dynamo_port}" amazon/dynamodb-local:latest -jar DynamoDBLocal.jar -port "${local_dynamo_port}" -sharedDb)
+  local_dynamo_container_id=$(docker run -d -p 49154:"${local_dynamo_port}" amazon/dynamodb-local:latest -jar DynamoDBLocal.jar -port "${local_dynamo_port}" -sharedDb)
   sleep 5 # TODO: This gives the container a bit of time to start up, but it would be better to poll for when its up instead
 }
 
@@ -91,6 +91,7 @@ function stop_local_dynamo {
 function create_tables {
   local local_dynamo_endpoint
   local_dynamo_endpoint=$(docker port "${local_dynamo_container_id}" "${local_dynamo_port}")
+  echo "Creating tables in local DynamoDB at ${local_dynamo_endpoint}"
   for table in "${tables[@]}"; do
     local schema_file table_json
     schema_file="${tmp_dir}/${table}.json"
