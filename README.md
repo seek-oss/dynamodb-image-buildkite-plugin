@@ -41,10 +41,8 @@ steps:
 ## Tagging
 The plugin tags images differently depending on whether the build is on a feature branch or the main branch:
 
-- Feature branch builds will tag the image as `branch-BUILDKITE_BUILD_NUMBER`, e.g., `branch-4985` for a build with build number `4985`.
-- Main branch builds will tag the image with the `latest` tag.
-
-The plugin is setup this way so that you could make changes to the definition of a table
+- Feature branch builds will tag the image as `branch-BUILDKITE_BUILD_NUMBER`, e.g., `branch-4985` for a build with build number `4985`
+- Main branch builds will tag the image with the `latest` tag
 
 ## Configuration
 
