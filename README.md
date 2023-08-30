@@ -11,7 +11,7 @@ For this plugin to work, you must ensure the following:
 
 ## Example
 
-This will create an [amazon/dynamodb-local](https://hub.docker.com/r/amazon/dynamodb-local) image containing the tables `Jobs` and `Applications` to the ECR repository with URI `123456789123.dkr.ecr.ap-southeast-2.amazonaws.com/my-ecr-repository`.
+This will create an [amazon/dynamodb-local](https://hub.docker.com/r/amazon/dynamodb-local) image containing the tables `Jobs` and `Applications` and publish it to the ECR repository with URI `123456789123.dkr.ecr.ap-southeast-2.amazonaws.com/my-ecr-repository`.
 
 ```yml
 steps:
