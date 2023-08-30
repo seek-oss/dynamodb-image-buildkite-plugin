@@ -11,7 +11,7 @@ For this plugin to work, you must ensure the following:
 
 ## Example
 
-This will create an [amazon/dynamodb-local](https://hub.docker.com/r/amazon/dynamodb-local) image containing the tables `Jobs` and `Applications` and publish it to the ECR repository with URI `123456789123.dkr.ecr.ap-southeast-2.amazonaws.com/my-ecr-repository`.
+This will create an [amazon/dynamodb-local](https://hub.docker.com/r/amazon/dynamodb-local) image containing the tables `Jobs` and `Applications` and publish it to the ECR repository with URI `123456789123.dkr.ecr.ap-southeast-2.amazonaws.com/my-ecr-repository`:
 
 ```yml
 steps:
@@ -24,7 +24,7 @@ steps:
           repository: 123456789123.dkr.ecr.ap-southeast-2.amazonaws.com/my-ecr-repository
 ```
 
-To run DynamoDB on a specific port when a container is run with the image, the `port` argument can be provided. The following example would run DynamoDB on port `8007`.
+To run DynamoDB on a specific port when a container is run with the image, the `port` argument can be provided. The following example would run DynamoDB on port `8007`:
 
 ```yml
 steps:
