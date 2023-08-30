@@ -32,8 +32,8 @@ steps:
     plugins:
       - seek-oss/dynamodb-image#v1.2.0:
           tables:
-            - Users
             - Jobs
+            - Applications
           repository: 123456789123.dkr.ecr.ap-southeast-2.amazonaws.com/my-ecr-repository
           port: 8007
 ```
