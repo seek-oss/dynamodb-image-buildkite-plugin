@@ -39,6 +39,7 @@ steps:
 ```
 
 ## Tagging
+
 The plugin tags images differently depending on whether the build is on a feature branch or the main branch:
 
 - Feature branch builds will tag the image as `branch-BUILDKITE_BUILD_NUMBER`, e.g., `branch-4985` for a build with build number `4985`
