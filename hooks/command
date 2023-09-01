@@ -109,14 +109,30 @@ function build_and_publish {
   docker buildx create --use
   if [[ ${BUILDKITE_BRANCH} == "${BUILDKITE_PIPELINE_DEFAULT_BRANCH}" ]]; then
     image="${repository}:latest"
+    docker buildx build \
+      --push \
+      --no-cache \
+      --file "${script_dir}"/Dockerfile \
+      --platform linux/arm64,linux/amd64 \
+      --build-arg PORT="${dynamo_port}" \
+      --tag "${image}" \
+      --tag "${repository}:${build}" \
+      .
   else
     image="${repository}:branch-${build}"
+    docker buildx build \
+      --push \
+      --no-cache \
+      -f "${script_dir}"/Dockerfile \
+      --platform linux/arm64,linux/amd64 \
+      --build-arg PORT="${dynamo_port}" \
+      -t "${image}" \
+      .
   fi
 
   local dynamo_port
   dynamo_port="${BUILDKITE_PLUGIN_DYNAMODB_IMAGE_PORT:-8000}"
 
-  docker buildx build --push --no-cache -t "${image}" -f "${script_dir}"/Dockerfile --platform linux/arm64,linux/amd64 --build-arg PORT="${dynamo_port}" .
   docker buildx rm
 }
 
