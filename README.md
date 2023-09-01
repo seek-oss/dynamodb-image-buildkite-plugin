@@ -1,5 +1,7 @@
 # DynamoDB Image Buildkite Plugin
 
+[![GitHub Release](https://img.shields.io/github/release/seek-oss/dynamodb-image-buildkite-plugin.svg)](https://github.com/seek-oss/dynamodb-image-buildkite-plugin/releases)
+
 A [Buildkite plugin](https://buildkite.com/docs/agent/v3/plugins) that introspects the schema of DynamoDB tables and then publishes multi-arch (linux/arm64 and linux/amd64) [amazon/dynamodb-local](https://hub.docker.com/r/amazon/dynamodb-local) images with these schemas to [ECR](https://aws.amazon.com/ecr/).
 
 ## Usage Requirements
