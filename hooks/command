@@ -123,10 +123,10 @@ function build_and_publish {
     docker buildx build \
       --push \
       --no-cache \
-      -f "${script_dir}"/Dockerfile \
+      --file "${script_dir}"/Dockerfile \
       --platform linux/arm64,linux/amd64 \
       --build-arg PORT="${dynamo_port}" \
-      -t "${image}" \
+      --tag "${image}" \
       .
   fi
 
