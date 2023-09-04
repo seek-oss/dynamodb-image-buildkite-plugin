@@ -8,7 +8,7 @@ configuration:
     repository:
       type: string
     tables:
-      type: [arra, string]
+      type: [array, string]
     port:
       type: number
   required: ['repository', 'tables']
