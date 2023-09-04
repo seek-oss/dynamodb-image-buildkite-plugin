@@ -5,3 +5,10 @@ services:
     command: ['--id', 'seek-oss/dynamodb-image']
     volumes:
       - ".:/plugin:ro"
+
+  test:
+    image: buildkite/plugin-tester
+    volumes:
+      - ".:/plugin:ro"
+
+
