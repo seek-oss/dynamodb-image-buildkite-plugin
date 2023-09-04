@@ -106,17 +106,32 @@ function create_tables {
 # Builds the multi-arch image and publishes it
 function build_and_publish {
   cd "${script_dir}"
+  local dynamo_port
+  dynamo_port="${BUILDKITE_PLUGIN_DYNAMODB_IMAGE_PORT:-8000}"
   docker buildx create --use
   if [[ ${BUILDKITE_BRANCH} == "${BUILDKITE_PIPELINE_DEFAULT_BRANCH}" ]]; then
     image="${repository}:latest"
+    docker buildx build \
+      --push \
+      --no-cache \
+      --file "${script_dir}"/Dockerfile \
+      --platform linux/arm64,linux/amd64 \
+      --build-arg PORT="${dynamo_port}" \
+      --tag "${image}" \
+      --tag "${repository}:${build}" \
+      .
   else
     image="${repository}:branch-${build}"
+    docker buildx build \
+      --push \
+      --no-cache \
+      --file "${script_dir}"/Dockerfile \
+      --platform linux/arm64,linux/amd64 \
+      --build-arg PORT="${dynamo_port}" \
+      --tag "${image}" \
+      .
   fi
 
-  local dynamo_port
-  dynamo_port="${BUILDKITE_PLUGIN_DYNAMODB_IMAGE_PORT:-8000}"
-
-  docker buildx build --push --no-cache -t "${image}" -f "${script_dir}"/Dockerfile --platform linux/arm64,linux/amd64 --build-arg PORT="${dynamo_port}" .
   docker buildx rm
 }
 
