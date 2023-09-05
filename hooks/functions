@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+script_dir="$(dirname "${BASH_SOURCE[0]}")"
+tmp_dir="${script_dir}/tmp"
+
 function check_null {
   local var_name="$1"
   local var_value="${!var_name:-}"
@@ -42,7 +45,23 @@ function read_tables {
   fi
 }
 
+# This is only used to test the read_tables function
 function read_tables_with_output {
   read_tables
   echo "${tables[@]}" 
 }
+
+# Retrieves schemas for a list of tables and saves them as JSON
+function retrieve_schemas {
+  local tables=("$@")
+  for table in "${tables[@]}"; do
+    local schema_file="${tmp_dir}/${table}.json"
+    local dynamo_json
+    dynamo_json=$(aws dynamodb describe-table \
+      --table-name "${table}" \
+      --output json)
+    echo "${dynamo_json}"
+    echo "${dynamo_json}" > "${schema_file}"
+  done
+}
+

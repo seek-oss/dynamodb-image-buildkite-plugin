@@ -20,17 +20,6 @@ local_dynamo_port=8000
 tmp_dir="${script_dir}/tmp"
 mkdir -p "${tmp_dir}"
 
-# Retrieves schemas and saves them as JSON
-function retrieve_schemas {
-  for table in "${tables[@]}"; do
-    local schema_file="${tmp_dir}/${table}.json"
-    aws dynamodb describe-table \
-      --table-name "${table}" \
-      --output json \
-      >"${schema_file}"
-  done
-}
-
 # Pulls local DynamoDB and runs it on port 8000
 function start_local_dynamo {
   docker pull amazon/dynamodb-local:latest
@@ -98,7 +87,7 @@ function build_and_publish {
 
 read_tables
 echo "1. Retrieve schemas..."
-retrieve_schemas
+retrieve_schemas "${tables[@]}"
 echo "2. Create database file..."
 start_local_dynamo
 create_tables
