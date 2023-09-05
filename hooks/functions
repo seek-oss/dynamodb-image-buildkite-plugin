@@ -65,3 +65,8 @@ function retrieve_schemas {
   done
 }
 
+# Reads a describe-table JSON and converts it to a create-table JSON
+function generate_create_json {
+  local input_json_file="$1"
+  echo $(jq '.Table | {TableName, KeySchema, AttributeDefinitions} + (try {LocalSecondaryIndexes: [ .LocalSecondaryIndexes[] | {IndexName, KeySchema, Projection} ]} // {}) + (try {GlobalSecondaryIndexes: [ .GlobalSecondaryIndexes[] | {IndexName, KeySchema, Projection} ]} // {}) + {BillingMode: "PAY_PER_REQUEST"}' "${input_json_file}")
+}

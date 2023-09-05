@@ -54,3 +54,38 @@ mkdir -p "/plugin/hooks/tmp"
 
   unstub aws
 }
+
+@test "generate_create_json pulls out all required fields from the schema" {
+  local test_file="/plugin/mock/TestTableNoIndexes.json"
+  run generate_create_json ${test_file}
+
+  assert_output --partial '"TableName": "SampleTable"'
+  assert_output --partial '"KeySchema": [ { "AttributeName": "ID", "KeyType": "HASH" }, { "AttributeName": "Name", "KeyType": "RANGE" } ]'
+  assert_output --partial '"AttributeDefinitions": [ { "AttributeName": "ID", "AttributeType": "N" }, { "AttributeName": "Name", "AttributeType": "S" } ]'
+  assert_success
+}
+
+@test "generate_create_json ignores the schema billing mode and always sets it to PAY_PER_REQUEST" {
+  local test_file="/plugin/mock/TestTableNoIndexes.json"
+  run generate_create_json ${test_file}
+
+  assert_output --partial '"BillingMode": "PAY_PER_REQUEST"'
+  assert_success
+}
+
+@test "generate_create_json includes the GSI when it is present" {
+  local test_file="/plugin/mock/TestTableGSI.json"
+  run generate_create_json ${test_file}
+
+  assert_output --partial '"GlobalSecondaryIndexes": [ { "IndexName": "TestTableGSI", "KeySchema": [ { "AttributeName": "SecondaryID", "KeyType": "HASH" } ], "Projection": { "ProjectionType": "ALL" } } ]'
+  assert_success
+}
+
+@test "generate_create_json includes the LSI when it is present" {
+  local test_file="/plugin/mock/TestTableLSI.json"
+  run generate_create_json ${test_file}
+
+  assert_output --partial '"LocalSecondaryIndexes": [ { "IndexName": "TestTableLSI", "KeySchema": [ { "AttributeName": "TernaryID", "KeyType": "HASH" } ]'
+  assert_success
+}
+

@@ -45,7 +45,7 @@ function create_tables {
   for table in "${tables[@]}"; do
     local schema_file table_json
     schema_file="${tmp_dir}/${table}.json"
-    table_json=$(jq '.Table | {TableName, KeySchema, AttributeDefinitions} + (try {LocalSecondaryIndexes: [ .LocalSecondaryIndexes[] | {IndexName, KeySchema, Projection} ]} // {}) + (try {GlobalSecondaryIndexes: [ .GlobalSecondaryIndexes[] | {IndexName, KeySchema, Projection} ]} // {}) + {BillingMode: "PAY_PER_REQUEST"}' "${schema_file}")
+    table_json=$(generate_create_json "${schema_file}")
     aws dynamodb create-table \
       --cli-input-json "${table_json}" \
       --region "local" --endpoint "${local_dynamo_endpoint}"

@@ -1,0 +1,39 @@
+{
+  "Table": {
+    "AttributeDefinitions": [
+      {
+        "AttributeName": "ID",
+        "AttributeType": "N"
+      },
+      {
+        "AttributeName": "Name",
+        "AttributeType": "S"
+      }
+    ],
+    "TableName": "SampleTable",
+    "KeySchema": [
+      {
+        "AttributeName": "ID",
+        "KeyType": "HASH"
+      },
+      {
+        "AttributeName": "Name",
+        "KeyType": "RANGE"
+      }
+    ],
+    "TableStatus": "ACTIVE",
+    "CreationDateTime": "2023-01-01T00:00:00.000000Z",
+    "ProvisionedThroughput": {
+      "NumberOfDecreasesToday": 0,
+      "ReadCapacityUnits": 5,
+      "WriteCapacityUnits": 5
+    },
+    "TableSizeBytes": 0,
+    "ItemCount": 0,
+    "TableArn": "arn:aws:dynamodb:us-east-1:123456789012:table/TestTable",
+    "BillingModeSummary": {
+      "BillingMode": "PROVISIONED",
+      "LastUpdateToPayPerRequestDateTime": "2023-01-01T00:00:00.000000Z"
+    }
+  }
+}
