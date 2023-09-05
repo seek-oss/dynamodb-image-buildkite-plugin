@@ -19,7 +19,7 @@ This will create an [amazon/dynamodb-local](https://hub.docker.com/r/amazon/dyna
 steps:
   - label: Publish Dynamo Image
     plugins:
-      - seek-oss/dynamodb-image#v1.2.0:
+      - seek-oss/dynamodb-image#v1.3.0:
           tables:
             - Jobs
             - Applications
@@ -32,7 +32,7 @@ To run DynamoDB on a specific port when a container is run with the image, the `
 steps:
   - label: Publish Dynamo Image
     plugins:
-      - seek-oss/dynamodb-image#v1.2.0:
+      - seek-oss/dynamodb-image#v1.3.0:
           tables:
             - Jobs
             - Applications
