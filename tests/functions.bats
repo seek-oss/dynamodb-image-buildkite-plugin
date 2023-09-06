@@ -6,24 +6,24 @@ load "$PWD/hooks/functions"
 
 mkdir -p "/plugin/hooks/tmp"
 
-@test "check_null does not throw when an environment variable exists" {
+@test "check_null: does not throw when an environment variable exists" {
   export BUILDKITE_BUILD_NUMBER="1234"
   run check_null BUILDKITE_BUILD_NUMBER
   assert_success
 }
 
-@test "check_null throws when an environment variable does not exist" {
+@test "check_null: throws when an environment variable does not exist" {
   run check_null BUILDKITE_BUILD_NUMBER
   assert_failure
 }
 
-@test "check_null throws when an environment variable is empty" {
+@test "check_null: throws when an environment variable is empty" {
   export BUILDKITE_BUILD_NUMBER=""
   run check_null BUILDKITE_BUILD_NUMBER
   assert_failure
 }
 
-@test "read_tables reads the tables into an array" {
+@test "read_tables: reads the tables into an array" {
   export BUILDKITE_PLUGIN_DYNAMODB_IMAGE_TABLES_0="my-table-0"
   export BUILDKITE_PLUGIN_DYNAMODB_IMAGE_TABLES_1="my-table-1"
   export BUILDKITE_PLUGIN_DYNAMODB_IMAGE_TABLES_2="my-table-2"
@@ -38,7 +38,7 @@ mkdir -p "/plugin/hooks/tmp"
   assert_failure
 }
 
-@test "retrieve_schemas should retrieve the schemas for each table using the aws cli" {
+@test "retrieve_schemas: should retrieve the schemas for each table using the aws cli" {
   stub aws \
     "dynamodb describe-table --table-name my-table-0 --output json : echo {"TableName": "my-table-0"}" \
     "dynamodb describe-table --table-name my-table-1 --output json : echo {"TableName": "my-table-1"}" \
@@ -55,7 +55,7 @@ mkdir -p "/plugin/hooks/tmp"
   unstub aws
 }
 
-@test "generate_create_json pulls out all required fields from the schema" {
+@test "generate_create_json: pulls out all required fields from the schema" {
   local test_file="/plugin/mock/TestTableNoIndexes.json"
   run generate_create_json ${test_file}
 
@@ -65,7 +65,7 @@ mkdir -p "/plugin/hooks/tmp"
   assert_success
 }
 
-@test "generate_create_json ignores the schema billing mode and always sets it to PAY_PER_REQUEST" {
+@test "generate_create_json: ignores the schema billing mode and always sets it to PAY_PER_REQUEST" {
   local test_file="/plugin/mock/TestTableNoIndexes.json"
   run generate_create_json ${test_file}
 
@@ -73,7 +73,7 @@ mkdir -p "/plugin/hooks/tmp"
   assert_success
 }
 
-@test "generate_create_json includes the GSI when it is present" {
+@test "generate_create_json: includes the GSI when it is present" {
   local test_file="/plugin/mock/TestTableGSI.json"
   run generate_create_json ${test_file}
 
@@ -81,7 +81,7 @@ mkdir -p "/plugin/hooks/tmp"
   assert_success
 }
 
-@test "generate_create_json includes the LSI when it is present" {
+@test "generate_create_json: includes the LSI when it is present" {
   local test_file="/plugin/mock/TestTableLSI.json"
   run generate_create_json ${test_file}
 
@@ -89,7 +89,7 @@ mkdir -p "/plugin/hooks/tmp"
   assert_success
 }
 
-@test "create_database creates each of the tables locally and saves the resulting database" {
+@test "create_database: creates each of the tables locally and saves the resulting database" {
   local test_tables=("my-table-0" "my-table-1" "my-table-2")
 
   stub aws \
