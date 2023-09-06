@@ -130,3 +130,44 @@ mkdir -p "/plugin/hooks/tmp"
   unstub sleep
 }
 
+@test "build_and_publish: builds and publishes the image with a branch tag when on a branch" {
+  export BUILDKITE_PIPELINE_DEFAULT_BRANCH="master"
+  export BUILDKITE_BRANCH="my-branch"
+  export BUILDKITE_BUILD_NUMBER="1234"
+  export BUILDKITE_PLUGIN_DYNAMODB_IMAGE_REPOSITORY="my-registry/my-image"
+
+  stub docker \
+    "buildx create --use : echo creating builder instance" \
+    "buildx build --push --no-cache --file /plugin/hooks/Dockerfile --platform linux/arm64,linux/amd64 --build-arg PORT=8000 --tag my-registry/my-image:branch-1234 . : echo building and publishing branch image" \
+    "buildx rm : echo removing builder instance"
+
+  run build_and_publish
+
+  assert_output --partial "creating builder instance"
+  assert_output --partial "building and publishing branch image"
+  assert_output --partial "removing builder instance"
+  assert_success
+
+  unstub docker
+}
+
+@test "build_and_publish: builds and publishes the image with the latest tag and a build tag when on the main branch" {
+  export BUILDKITE_PIPELINE_DEFAULT_BRANCH="master"
+  export BUILDKITE_BRANCH="master"
+  export BUILDKITE_BUILD_NUMBER="1234"
+  export BUILDKITE_PLUGIN_DYNAMODB_IMAGE_REPOSITORY="my-registry/my-image"
+
+  stub docker \
+    "buildx create --use : echo creating builder instance" \
+    "buildx build --push --no-cache --file /plugin/hooks/Dockerfile --platform linux/arm64,linux/amd64 --build-arg PORT=8000 --tag my-registry/my-image:latest --tag my-registry/my-image:1234 . : echo building and publishing latest image" \
+    "buildx rm : echo removing builder instance"
+
+  run build_and_publish
+
+  assert_output --partial "creating builder instance"
+  assert_output --partial "building and publishing latest image"
+  assert_output --partial "removing builder instance"
+  assert_success
+
+  unstub docker
+}

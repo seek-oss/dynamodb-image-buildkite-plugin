@@ -3,6 +3,9 @@
 set -euo pipefail
 
 script_dir="$(dirname "${BASH_SOURCE[0]}")"
+tmp_dir="${script_dir}/tmp"
+mkdir -p "${tmp_dir}"
+
 source "${script_dir}/functions"
 
 export DOCKER_CLI_EXPERIMENTAL=enabled
@@ -12,46 +15,7 @@ check_null BUILDKITE_BUILD_NUMBER
 check_null BUILDKITE_BRANCH
 check_null BUILDKITE_PIPELINE_DEFAULT_BRANCH
 
-build="${BUILDKITE_BUILD_NUMBER:-}"
-repository="$BUILDKITE_PLUGIN_DYNAMODB_IMAGE_REPOSITORY"
 tables=()
-local_dynamo_container_id=""
-local_dynamo_port=8000
-tmp_dir="${script_dir}/tmp"
-mkdir -p "${tmp_dir}"
-
-# Builds the multi-arch image and publishes it
-function build_and_publish {
-  cd "${script_dir}"
-  local dynamo_port
-  dynamo_port="${BUILDKITE_PLUGIN_DYNAMODB_IMAGE_PORT:-8000}"
-  docker buildx create --use
-  if [[ ${BUILDKITE_BRANCH} == "${BUILDKITE_PIPELINE_DEFAULT_BRANCH}" ]]; then
-    image="${repository}:latest"
-    docker buildx build \
-      --push \
-      --no-cache \
-      --file "${script_dir}"/Dockerfile \
-      --platform linux/arm64,linux/amd64 \
-      --build-arg PORT="${dynamo_port}" \
-      --tag "${image}" \
-      --tag "${repository}:${build}" \
-      .
-  else
-    image="${repository}:branch-${build}"
-    docker buildx build \
-      --push \
-      --no-cache \
-      --file "${script_dir}"/Dockerfile \
-      --platform linux/arm64,linux/amd64 \
-      --build-arg PORT="${dynamo_port}" \
-      --tag "${image}" \
-      .
-  fi
-
-  docker buildx rm
-}
-
 read_tables
 echo "1. Retrieve schemas..."
 retrieve_schemas "${tables[@]}"
