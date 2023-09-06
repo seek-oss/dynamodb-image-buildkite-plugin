@@ -56,6 +56,6 @@ read_tables
 echo "1. Retrieve schemas..."
 retrieve_schemas "${tables[@]}"
 echo "2. Create database file..."
-create_database
+create_database "${tables[@]}"
 echo "3. Build and publish multi-arch images..."
 build_and_publish
