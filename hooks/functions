@@ -70,3 +70,32 @@ function generate_create_json {
   local input_json_file="$1"
   echo $(jq '.Table | {TableName, KeySchema, AttributeDefinitions} + (try {LocalSecondaryIndexes: [ .LocalSecondaryIndexes[] | {IndexName, KeySchema, Projection} ]} // {}) + (try {GlobalSecondaryIndexes: [ .GlobalSecondaryIndexes[] | {IndexName, KeySchema, Projection} ]} // {}) + {BillingMode: "PAY_PER_REQUEST"}' "${input_json_file}")
 }
+
+# Creates the necessary database files and saves them to the local filesystem
+function create_database {
+  local tables=("$@")
+  local local_dynamo_port local_dynamo_container_id local_dynamo_endpoint container_port
+  
+  # Start dynamo locally
+  local_dynamo_port=8000
+  docker pull amazon/dynamodb-local:latest
+  local_dynamo_container_id=$(docker run -d -p 0:"${local_dynamo_port}" amazon/dynamodb-local:latest -jar DynamoDBLocal.jar -port "${local_dynamo_port}" -sharedDb)
+  sleep 5 # TODO: This gives the container a bit of time to start up, but it would be better to poll for when its up instead
+
+  # Create the tables
+  container_port=$(docker port "${local_dynamo_container_id}" "${local_dynamo_port}" | cut -d':' -f2)
+  local_dynamo_endpoint=http://localhost:"${container_port}"
+  for table in "${tables[@]}"; do
+    local schema_file table_json
+    schema_file="${tmp_dir}/${table}.json"
+    table_json=$(generate_create_json "${schema_file}")
+    aws dynamodb create-table --cli-input-json "${table_json}" --region "local" --endpoint "${local_dynamo_endpoint}"
+  done
+  aws dynamodb list-tables --region "local" --endpoint "${local_dynamo_endpoint}"
+  
+  # Save the database file so that we can use it in the build
+  docker cp "${local_dynamo_container_id}":/home/dynamodblocal/shared-local-instance.db "${tmp_dir}"/shared-local-instance.db
+
+  # Stop running local dynamo
+  docker stop "${local_dynamo_container_id}"
+}

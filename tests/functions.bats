@@ -89,3 +89,44 @@ mkdir -p "/plugin/hooks/tmp"
   assert_success
 }
 
+@test "create_database creates each of the tables locally and saves the resulting database" {
+  local test_tables=("my-table-0" "my-table-1" "my-table-2")
+
+  stub aws \
+    "dynamodb create-table --cli-input-json /plugin/hooks/tmp/my-table-0.json --region "local" --endpoint http://localhost:56789 : echo create my-table-0" \
+    "dynamodb create-table --cli-input-json /plugin/hooks/tmp/my-table-1.json --region "local" --endpoint http://localhost:56789 : echo create my-table-1" \
+    "dynamodb create-table --cli-input-json /plugin/hooks/tmp/my-table-2.json --region "local" --endpoint http://localhost:56789 : echo create my-table-2" \
+    "dynamodb list-tables --region "local" --endpoint http://localhost:56789 : echo listing tables"
+
+  stub docker \
+    "pull amazon/dynamodb-local:latest : echo pulled amazon/dynamodb-local:latest" \
+    "run -d -p 0:8000 amazon/dynamodb-local:latest -jar DynamoDBLocal.jar -port 8000 -sharedDb : echo 123456789" \
+    "port 123456789 8000 : echo 0.0.0.0:56789" \
+    "cp 123456789:/home/dynamodblocal/shared-local-instance.db /plugin/hooks/tmp/shared-local-instance.db : echo copied database" \
+    "stop 123456789 : echo stopped local dynamo" 
+
+  stub sleep \
+    "5 : echo sleeping for 5 seconds while dynamo starts"
+
+  function generate_create_json() {
+    local input_json_file="$1"
+    echo "${input_json_file}"
+  }
+
+  run create_database "${test_tables[@]}"
+
+  assert_output --partial "pulled amazon/dynamodb-local:latest"
+  assert_output --partial "sleeping for 5 seconds while dynamo starts"
+  assert_output --partial "create my-table-0"
+  assert_output --partial "create my-table-1"
+  assert_output --partial "create my-table-2"
+  assert_output --partial "listing tables"
+  assert_output --partial "copied database"
+  assert_output --partial "stopped local dynamo"
+  assert_success
+
+  unstub aws
+  unstub docker
+  unstub sleep
+}
+

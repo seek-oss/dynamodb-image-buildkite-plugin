@@ -20,39 +20,6 @@ local_dynamo_port=8000
 tmp_dir="${script_dir}/tmp"
 mkdir -p "${tmp_dir}"
 
-# Pulls local DynamoDB and runs it on port 8000
-function start_local_dynamo {
-  docker pull amazon/dynamodb-local:latest
-  local_dynamo_container_id=$(docker run -d -p 0:"${local_dynamo_port}" amazon/dynamodb-local:latest -jar DynamoDBLocal.jar -port "${local_dynamo_port}" -sharedDb)
-  sleep 5 # TODO: This gives the container a bit of time to start up, but it would be better to poll for when its up instead
-}
-
-# Saves the database file so that we can use it in the build
-function save_database {
-  docker cp "${local_dynamo_container_id}":/home/dynamodblocal/shared-local-instance.db "${tmp_dir}"/shared-local-instance.db
-}
-
-# Stop running local dynamo
-function stop_local_dynamo {
-  docker stop "${local_dynamo_container_id}"
-}
-
-# Create the tables in the local Dynamo image
-function create_tables {
-  local local_dynamo_endpoint container_port
-  container_port=$(docker port "${local_dynamo_container_id}" "${local_dynamo_port}" | cut -d':' -f2)
-  local_dynamo_endpoint=http://localhost:"${container_port}"
-  for table in "${tables[@]}"; do
-    local schema_file table_json
-    schema_file="${tmp_dir}/${table}.json"
-    table_json=$(generate_create_json "${schema_file}")
-    aws dynamodb create-table \
-      --cli-input-json "${table_json}" \
-      --region "local" --endpoint "${local_dynamo_endpoint}"
-  done
-  aws dynamodb list-tables --region "local" --endpoint "${local_dynamo_endpoint}"
-}
-
 # Builds the multi-arch image and publishes it
 function build_and_publish {
   cd "${script_dir}"
@@ -89,9 +56,6 @@ read_tables
 echo "1. Retrieve schemas..."
 retrieve_schemas "${tables[@]}"
 echo "2. Create database file..."
-start_local_dynamo
-create_tables
-save_database
-stop_local_dynamo
+create_database
 echo "3. Build and publish multi-arch images..."
 build_and_publish
