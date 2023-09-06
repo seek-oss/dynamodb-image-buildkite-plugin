@@ -2,13 +2,8 @@
 
 set -euo pipefail
 
-script_dir="$(dirname "${BASH_SOURCE[0]}")"
-tmp_dir="${script_dir}/tmp"
-mkdir -p "${tmp_dir}"
+source "$(dirname "${BASH_SOURCE[0]}")/functions"
 
-source "${script_dir}/functions"
-
-export DOCKER_CLI_EXPERIMENTAL=enabled
 export AWS_PAGER=""
 
 check_null BUILDKITE_BUILD_NUMBER

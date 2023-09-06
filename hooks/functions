@@ -2,6 +2,7 @@
 
 script_dir="$(dirname "${BASH_SOURCE[0]}")"
 tmp_dir="${script_dir}/tmp"
+mkdir -p "${tmp_dir}"
 
 function check_null {
   local var_name="$1"

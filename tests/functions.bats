@@ -130,7 +130,7 @@ mkdir -p "/plugin/hooks/tmp"
   unstub sleep
 }
 
-@test "build_and_publish: builds and publishes the image with a branch tag when on a branch" {
+@test "build_and_publish: builds and publishes the image with a build number branch tag when on a branch" {
   export BUILDKITE_PIPELINE_DEFAULT_BRANCH="master"
   export BUILDKITE_BRANCH="my-branch"
   export BUILDKITE_BUILD_NUMBER="1234"
@@ -151,7 +151,7 @@ mkdir -p "/plugin/hooks/tmp"
   unstub docker
 }
 
-@test "build_and_publish: builds and publishes the image with the latest tag and a build tag when on the main branch" {
+@test "build_and_publish: builds and publishes the image with the latest tag and a build number tag when on the main branch" {
   export BUILDKITE_PIPELINE_DEFAULT_BRANCH="master"
   export BUILDKITE_BRANCH="master"
   export BUILDKITE_BUILD_NUMBER="1234"
