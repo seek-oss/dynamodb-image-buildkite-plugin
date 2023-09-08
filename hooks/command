@@ -106,17 +106,13 @@ function create_tables {
 # Login to ECR
 function login_to_ecr {
   local should_login
-  # Default to true when `login` arg is not provided
-  if [[ -z "${BUILDKITE_PLUGIN_DYNAMODB_IMAGE_LOGIN:-}" ]]; then
+
+  if [[ "${BUILDKITE_PLUGIN_DYNAMODB_IMAGE_LOGIN:-0}" =~ ^(true|on|1)$ ]]; then
     should_login=1
   else
-    if [[ "${BUILDKITE_PLUGIN_DYNAMODB_IMAGE_LOGIN}" =~ ^(false|off|0)$ ]]; then
-      should_login=0
-    else
-      should_login=1
-    fi
+    should_login=0
   fi
-
+  
   if [ "${should_login}" = 1 ]; then
     echo "Logging into ECR..."
     local aws_region aws_account_id
