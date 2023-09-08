@@ -103,6 +103,29 @@ function create_tables {
   aws dynamodb list-tables --region "local" --endpoint "${local_dynamo_endpoint}"
 }
 
+# Login to ECR
+function login_to_ecr {
+  local should_login
+  # Default to true when `login` arg is not provided
+  if [[ -z "${BUILDKITE_PLUGIN_DYNAMODB_IMAGE_LOGIN:-}" ]]; then
+    should_login=1
+  else
+    if [[ "${BUILDKITE_PLUGIN_DYNAMODB_IMAGE_LOGIN}" =~ ^(false|off|0)$ ]]; then
+      should_login=0
+    else
+      should_login=1
+    fi
+  fi
+
+  if [ "${should_login}" = 1 ]; then
+    echo "Logging into ECR..."
+    local aws_region aws_account_id
+    aws_region=$(aws configure get region)
+    aws_account_id=$(aws sts get-caller-identity --query "Account" --output text)
+    aws ecr get-login-password --region "${aws_region}" | docker login --username AWS --password-stdin "${aws_account_id}".dkr.ecr."${aws_region}".amazonaws.com
+  fi
+}
+
 # Builds the multi-arch image and publishes it
 function build_and_publish {
   cd "${script_dir}"
@@ -144,4 +167,5 @@ create_tables
 save_database
 stop_local_dynamo
 echo "3. Build and publish multi-arch images..."
+login_to_ecr
 build_and_publish

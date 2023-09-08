@@ -11,4 +11,6 @@ configuration:
       type: [array, string]
     port:
       type: number
+    login:
+      type: boolean
   required: ['repository', 'tables']
