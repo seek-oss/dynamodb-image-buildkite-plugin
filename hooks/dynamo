@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-java -jar DynamoDBLocal.jar -port $DYNAMO_PORT -sharedDb
+exec java -jar DynamoDBLocal.jar -port $DYNAMO_PORT -sharedDb
