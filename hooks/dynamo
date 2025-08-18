@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 trap 'kill -TERM $PID' TERM INT
-java -jar DynamoDBLocal.jar -port $DYNAMO_PORT -sharedDb .
+java -jar DynamoDBLocal.jar -port $DYNAMO_PORT -sharedDb . &
 PID=$!
 wait $PID
 trap - TERM INT
