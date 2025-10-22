@@ -103,7 +103,7 @@ mkdir -p "/plugin/hooks/tmp"
     "run -d -p 0:8000 amazon/dynamodb-local:latest -jar DynamoDBLocal.jar -port 8000 -sharedDb : echo 123456789" \
     "port 123456789 8000 : echo 0.0.0.0:56789" \
     "cp 123456789:/home/dynamodblocal/shared-local-instance.db /plugin/hooks/tmp/shared-local-instance.db : echo copied database" \
-    "stop 123456789 : echo stopped local dynamo" 
+    "stop 123456789 : echo stopped local dynamo"
 
   stub sleep \
     "5 : echo sleeping for 5 seconds while dynamo starts"
@@ -138,7 +138,7 @@ mkdir -p "/plugin/hooks/tmp"
 
   stub docker \
     "buildx create --use : echo creating builder instance" \
-    "buildx build --push --no-cache --file /plugin/hooks/Dockerfile --platform linux/arm64,linux/amd64 --build-arg PORT=8000 --tag my-registry/my-image:branch-1234 . : echo building and publishing branch image" \
+    "buildx build --push --no-cache --file /plugin/hooks/Dockerfile --platform linux/arm64 --build-arg PORT=8000 --tag my-registry/my-image:branch-1234 . : echo building and publishing branch image" \
     "buildx rm : echo removing builder instance"
 
   run build_and_publish
@@ -159,7 +159,7 @@ mkdir -p "/plugin/hooks/tmp"
 
   stub docker \
     "buildx create --use : echo creating builder instance" \
-    "buildx build --push --no-cache --file /plugin/hooks/Dockerfile --platform linux/arm64,linux/amd64 --build-arg PORT=8000 --tag my-registry/my-image:latest --tag my-registry/my-image:1234 . : echo building and publishing latest image" \
+    "buildx build --push --no-cache --file /plugin/hooks/Dockerfile --platform linux/arm64 --build-arg PORT=8000 --tag my-registry/my-image:latest --tag my-registry/my-image:1234 . : echo building and publishing latest image" \
     "buildx rm : echo removing builder instance"
 
   run build_and_publish

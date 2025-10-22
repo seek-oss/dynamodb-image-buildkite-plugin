@@ -49,7 +49,7 @@ function read_tables {
 # This is only used to test the read_tables function
 function read_tables_with_output {
   read_tables
-  echo "${tables[@]}" 
+  echo "${tables[@]}"
 }
 
 # Retrieves schemas for a list of tables and saves them as JSON
@@ -76,7 +76,7 @@ function generate_create_json {
 function create_database {
   local tables=("$@")
   local local_dynamo_port local_dynamo_container_id local_dynamo_endpoint container_port
-  
+
   # Start dynamo locally
   local_dynamo_port=8000
   docker pull amazon/dynamodb-local:latest
@@ -93,7 +93,7 @@ function create_database {
     aws dynamodb create-table --cli-input-json "${table_json}" --region "local" --endpoint "${local_dynamo_endpoint}"
   done
   aws dynamodb list-tables --region "local" --endpoint "${local_dynamo_endpoint}"
-  
+
   # Save the database file so that we can use it in the build
   docker cp "${local_dynamo_container_id}":/home/dynamodblocal/shared-local-instance.db "${tmp_dir}"/shared-local-instance.db
 
@@ -115,7 +115,7 @@ function build_and_publish {
       --push \
       --no-cache \
       --file "${script_dir}"/Dockerfile \
-      --platform linux/arm64,linux/amd64 \
+      --platform linux/arm64 \
       --build-arg PORT="${dynamo_port}" \
       --tag "${image}" \
       --tag "${repository}:${build}" \
@@ -126,7 +126,7 @@ function build_and_publish {
       --push \
       --no-cache \
       --file "${script_dir}"/Dockerfile \
-      --platform linux/arm64,linux/amd64 \
+      --platform linux/arm64 \
       --build-arg PORT="${dynamo_port}" \
       --tag "${image}" \
       .
