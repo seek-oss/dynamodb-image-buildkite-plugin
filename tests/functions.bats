@@ -137,15 +137,13 @@ mkdir -p "/plugin/hooks/tmp"
   export BUILDKITE_PLUGIN_DYNAMODB_IMAGE_REPOSITORY="my-registry/my-image"
 
   stub docker \
-    "buildx create --use : echo creating builder instance" \
-    "buildx build --push --no-cache --file /plugin/hooks/Dockerfile --platform linux/arm64 --build-arg PORT=8000 --tag my-registry/my-image:branch-1234 . : echo building and publishing branch image" \
-    "buildx rm : echo removing builder instance"
+    "build --no-cache --file /plugin/hooks/Dockerfile --build-arg PORT=8000 --tag my-registry/my-image:branch-1234 . : echo building and publishing branch image" \
+    "push my-registry/my-image:branch-1234 : echo pushing branch image"
 
   run build_and_publish
 
-  assert_output --partial "creating builder instance"
   assert_output --partial "building and publishing branch image"
-  assert_output --partial "removing builder instance"
+  assert_output --partial "pushing branch image"
   assert_success
 
   unstub docker
@@ -158,15 +156,15 @@ mkdir -p "/plugin/hooks/tmp"
   export BUILDKITE_PLUGIN_DYNAMODB_IMAGE_REPOSITORY="my-registry/my-image"
 
   stub docker \
-    "buildx create --use : echo creating builder instance" \
-    "buildx build --push --no-cache --file /plugin/hooks/Dockerfile --platform linux/arm64 --build-arg PORT=8000 --tag my-registry/my-image:latest --tag my-registry/my-image:1234 . : echo building and publishing latest image" \
-    "buildx rm : echo removing builder instance"
+    "build --no-cache --file /plugin/hooks/Dockerfile --build-arg PORT=8000 --tag my-registry/my-image:latest --tag my-registry/my-image:1234 . : echo building and publishing latest image" \
+    "push my-registry/my-image:latest : echo pushing latest image" \
+    "push my-registry/my-image:1234 : echo pushing build number image"
 
   run build_and_publish
 
-  assert_output --partial "creating builder instance"
   assert_output --partial "building and publishing latest image"
-  assert_output --partial "removing builder instance"
+  assert_output --partial "pushing latest image"
+  assert_output --partial "pushing build number image"
   assert_success
 
   unstub docker
