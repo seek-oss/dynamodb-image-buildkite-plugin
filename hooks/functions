@@ -101,7 +101,6 @@ function create_database {
   docker stop "${local_dynamo_container_id}"
 }
 
-# Builds the multi-arch image and publishes it
 function build_and_publish {
   cd "${script_dir}"
   local dynamo_port
@@ -111,22 +110,20 @@ function build_and_publish {
   docker buildx create --use
   if [[ ${BUILDKITE_BRANCH} == "${BUILDKITE_PIPELINE_DEFAULT_BRANCH}" ]]; then
     image="${repository}:latest"
-    docker buildx build \
+    docker build build \
       --push \
       --no-cache \
       --file "${script_dir}"/Dockerfile \
-      --platform linux/arm64 \
       --build-arg PORT="${dynamo_port}" \
       --tag "${image}" \
       --tag "${repository}:${build}" \
       .
   else
     image="${repository}:branch-${build}"
-    docker buildx build \
+    docker build build \
       --push \
       --no-cache \
       --file "${script_dir}"/Dockerfile \
-      --platform linux/arm64 \
       --build-arg PORT="${dynamo_port}" \
       --tag "${image}" \
       .
