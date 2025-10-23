@@ -2,7 +2,9 @@
 
 [![GitHub Release](https://img.shields.io/github/release/seek-oss/dynamodb-image-buildkite-plugin.svg)](https://github.com/seek-oss/dynamodb-image-buildkite-plugin/releases)
 
-A [Buildkite plugin](https://buildkite.com/docs/agent/v3/plugins) that introspects the schema of DynamoDB tables and then publishes multi-arch (linux/arm64 and linux/amd64) [amazon/dynamodb-local](https://hub.docker.com/r/amazon/dynamodb-local) images with these schemas to [ECR](https://aws.amazon.com/ecr/).
+A [Buildkite plugin](https://buildkite.com/docs/agent/v3/plugins) that introspects the schema of DynamoDB tables and then publishes linux/arm64 [amazon/dynamodb-local](https://hub.docker.com/r/amazon/dynamodb-local) images with these schemas to [ECR](https://aws.amazon.com/ecr/).
+
+Publishing multi-architecture images is no longer supported. These were removed since all observed plugin usage occurs on arm64 architectures and it simplifies image tagging in [ECR](https://aws.amazon.com/ecr/). If you have a use case for multi-architecture images, please open an issue.
 
 ## Usage Requirements
 
@@ -19,7 +21,7 @@ This will create an [amazon/dynamodb-local](https://hub.docker.com/r/amazon/dyna
 steps:
   - label: Publish Dynamo Image
     plugins:
-      - seek-oss/dynamodb-image#v1.4.0:
+      - seek-oss/dynamodb-image#v2.0.0:
           tables:
             - Jobs
             - Applications
@@ -32,7 +34,7 @@ To run DynamoDB on a specific port when a container is run with the image, the `
 steps:
   - label: Publish Dynamo Image
     plugins:
-      - seek-oss/dynamodb-image#v1.4.0:
+      - seek-oss/dynamodb-image#v2.0.0:
           tables:
             - Jobs
             - Applications
